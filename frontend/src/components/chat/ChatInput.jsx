@@ -53,16 +53,16 @@ const ChatInput = ({ onSendMessage, disabled = false }) => {
 
   return (
     <div className="border-t border-gray-200 bg-white">
-      {/* Quick Suggestions */}
+      {/* Quick Suggestions - Better mobile layout */}
       {message === '' && (
-        <div className="px-4 py-2 border-b border-gray-100">
-          <div className="flex flex-wrap gap-2">
+        <div className="px-3 py-2 border-b border-gray-100">
+          <div className="flex flex-wrap gap-1.5">
             {quickSuggestions.map((suggestion, index) => (
               <button
                 key={index}
                 onClick={() => handleSuggestionClick(suggestion)}
                 disabled={disabled}
-                className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full hover:bg-blue-100 hover:text-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="text-[10px] sm:text-xs bg-gray-100 text-gray-600 px-2 py-1 sm:px-3 sm:py-1 rounded-full hover:bg-blue-100 hover:text-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
               >
                 {suggestion}
               </button>
@@ -71,20 +71,20 @@ const ChatInput = ({ onSendMessage, disabled = false }) => {
         </div>
       )}
 
-      {/* Input Area */}
-      <form onSubmit={handleSubmit} className="p-4">
-        <div className="flex items-end space-x-2">
+      {/* Input Area - Improved mobile layout */}
+      <form onSubmit={handleSubmit} className="p-3 sm:p-4">
+        <div className="flex items-end space-x-1.5 sm:space-x-2">
           {/* Additional Actions (Future: File upload, etc.) */}
           <button
             type="button"
             disabled={disabled}
-            className="flex-shrink-0 p-2 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-shrink-0 p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             title="More options (coming soon)"
           >
-            <Paperclip className="w-4 h-4" />
+            <Paperclip className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
 
-          {/* Text Input */}
+          {/* Text Input - Better mobile sizing */}
           <div className="flex-1 relative">
             <textarea
               ref={textareaRef}
@@ -94,8 +94,8 @@ const ChatInput = ({ onSendMessage, disabled = false }) => {
               placeholder={disabled ? "AI is thinking..." : "Ask about air quality..."}
               disabled={disabled}
               rows={1}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-              style={{ minHeight: '40px', maxHeight: '100px' }}
+              className="w-full px-2.5 py-1.5 sm:px-3 sm:py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm sm:text-base"
+              style={{ minHeight: '36px', maxHeight: '100px' }}
             />
             
             {/* Character counter for long messages */}
@@ -110,28 +110,28 @@ const ChatInput = ({ onSendMessage, disabled = false }) => {
           <button
             type="button"
             disabled={disabled}
-            className="flex-shrink-0 p-2 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-shrink-0 p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             title="Emojis (coming soon)"
           >
-            <Smile className="w-4 h-4" />
+            <Smile className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
 
-          {/* Send Button */}
+          {/* Send Button - Better mobile sizing */}
           <button
             type="submit"
             disabled={disabled || !message.trim()}
-            className="flex-shrink-0 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400"
+            className="flex-shrink-0 p-1.5 sm:p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400"
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
 
-        {/* Input Helper Text */}
-        <div className="mt-2 text-xs text-gray-500 flex items-center justify-between">
-          <span>Press Enter to send, Shift+Enter for new line</span>
+        {/* Input Helper Text - Better mobile text sizing */}
+        <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-xs text-gray-500 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+          <span>Enter to send, Shift+Enter for new line</span>
           {disabled && (
-            <span className="text-blue-600 flex items-center">
-              <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse mr-1"></div>
+            <span className="text-blue-600 flex items-center text-xs">
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-600 rounded-full animate-pulse mr-1"></div>
               AI is typing...
             </span>
           )}

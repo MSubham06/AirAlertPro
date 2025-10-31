@@ -43,13 +43,13 @@ function AppContent() {
         
         {/* Main Layout */}
         <div className="flex">
-          {/* Sidebar Navigation */}
+          {/* Sidebar Navigation - Hidden on mobile, visible on large screens */}
           <div className="hidden lg:block w-64 bg-white shadow-sm min-h-screen">
             <Navigation />
           </div>
           
-          {/* Main Content */}
-          <div className="flex-1 pb-20 lg:pb-0">
+          {/* Main Content - Full width on mobile, reduced on large screens */}
+          <div className="flex-1 pb-24 md:pb-20 lg:pb-0">
             <Routes>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/forecast" element={<Forecast />} />
@@ -61,8 +61,8 @@ function AppContent() {
           </div>
         </div>
 
-        {/* Mobile Navigation for App Pages - Proper Z-index */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-2 py-2 z-30 shadow-lg">
+        {/* Mobile Navigation for App Pages - Enhanced responsive design */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-1 py-2 z-30 shadow-lg">
           <div className="flex justify-around items-center">
             {[
               { to: '/dashboard', icon: '📊', label: 'Dashboard' },
@@ -74,7 +74,7 @@ function AppContent() {
               <a
                 key={to}
                 href={to}
-                className={`flex flex-col items-center space-y-1 py-2 px-2 rounded-lg text-xs font-medium transition-all duration-200 min-w-0 flex-1 ${
+                className={`flex flex-col items-center space-y-0.5 py-1.5 px-0.5 rounded-lg text-[10px] font-medium transition-all duration-200 min-w-0 flex-1 ${
                   location.pathname === to
                     ? 'text-blue-600 bg-blue-50 scale-105'
                     : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
@@ -87,9 +87,9 @@ function AppContent() {
           </div>
           
           {/* Chat Status Indicator in Mobile Nav */}
-          <div className="absolute -top-3 right-6">
-            <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-md">
-              <span className="text-white text-xs">💬</span>
+          <div className="absolute -top-2.5 right-4">
+            <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shadow-md">
+              <span className="text-white text-[8px]">💬</span>
             </div>
           </div>
         </div>

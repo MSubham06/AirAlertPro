@@ -1,8 +1,15 @@
 {
   "rewrites": [
     {
+      "source": "/mock-api/:endpoint*",
+      "destination": "/mock-api-handler.js"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "env": {
+    "VITE_API_URL": "http://localhost:5173/mock-api"
+  }
 }

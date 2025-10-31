@@ -7,6 +7,22 @@
 @layer base {
   body {
     @apply bg-gray-50 text-gray-900;
+    /* Prevent zoom on input focus on mobile */
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  /* Mobile-specific improvements */
+  @media (max-width: 767px) {
+    body {
+      /* Prevent horizontal scrolling */
+      overflow-x: hidden;
+    }
+    
+    /* Improve tap targets on mobile */
+    button, a, input, textarea {
+      min-height: 44px;
+      min-width: 44px;
+    }
   }
 }
 
@@ -37,6 +53,31 @@
   
   .aqi-severe {
     @apply border-l-4 border-aqi-severe;
+  }
+  
+  /* Mobile-specific utility classes */
+  .mobile-container {
+    @apply px-4;
+  }
+  
+  .mobile-card {
+    @apply rounded-lg p-4;
+  }
+  
+  .mobile-header {
+    @apply text-xl font-bold;
+  }
+  
+  .mobile-subheader {
+    @apply text-lg font-semibold;
+  }
+  
+  .mobile-body {
+    @apply text-sm;
+  }
+  
+  .mobile-caption {
+    @apply text-xs;
   }
 }
 
@@ -82,34 +123,35 @@
   }
 }
 
-
-
-@keyframes gradientMove {
-  0% {
-    background-position: 0% 50%;
+/* Mobile-specific improvements */
+@media (max-width: 767px) {
+  /* Prevent input zoom on iOS */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea {
+    font-size: 16px;
   }
-  50% {
-    background-position: 100% 50%;
+  
+  /* Improve touch targets */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
   }
-  100% {
-    background-position: 0% 50%;
+  
+  /* Better spacing on mobile */
+  .mobile-space-y {
+    margin-bottom: 1rem;
   }
-}
-
-.animate-gradient-move {
-  background-size: 200% 200%;
-  animation: gradientMove 12s ease infinite;
-}
-
-@keyframes floatSlow {
-  0%, 100% {
-    transform: translateY(0) translateX(0);
+  
+  /* Prevent text selection on buttons */
+  button {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
-  50% {
-    transform: translateY(-20px) translateX(10px);
-  }
-}
-
-.animate-float-slow {
-  animation: floatSlow 8s ease-in-out infinite;
 }

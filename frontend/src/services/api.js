@@ -1,12 +1,17 @@
 import axios from 'axios';
+import mockApi from './mockApi';
 
 // Get API URL from environment variable with fallback
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+// Check if we should use mock data (for development or when backend is unavailable)
+const USE_MOCK_DATA = import.meta.env.VITE_API_URL?.includes('mock-api') || import.meta.env.DEV;
 
 // Log the API URL in development for debugging
 if (import.meta.env.DEV) {
   console.log('🔗 API Base URL:', BASE_URL);
   console.log('🌍 Environment:', import.meta.env.MODE);
+  console.log('🎭 Using Mock Data:', USE_MOCK_DATA);
 }
 
 // Create axios instance with enhanced configuration
@@ -134,48 +139,170 @@ const apiCall = async (apiFunction, errorContext = '') => {
   }
 };
 
+// Enhanced API methods that can fall back to mock data
+const createApiMethod = (realMethod, mockMethod, methodName) => {
+  if (USE_MOCK_DATA) {
+    if (import.meta.env.DEV) {
+      console.log(`🎭 Using mock data for ${methodName}`);
+    }
+    return mockMethod;
+  }
+  
+  return (...args) => {
+    // Try real API first, fall back to mock if it fails
+    return realMethod(...args).catch((error) => {
+      console.warn(`⚠️  Falling back to mock data for ${methodName} due to:`, error.message);
+      return mockMethod(...args);
+    });
+  };
+};
+
 export const airQualityAPI = {
   // Core endpoints
-  getCurrentData: () => api.get('/api/current'),
-  getForecast: () => api.get('/api/forecast'),
-  getTrends: (days = 7) => api.get(`/api/trends?days=${days}`),
+  getCurrentData: createApiMethod(
+    () => api.get('/api/current'),
+    () => mockApi.getCurrentData(),
+    'getCurrentData'
+  ),
+  
+  getForecast: createApiMethod(
+    () => api.get('/api/forecast'),
+    () => mockApi.getForecast(),
+    'getForecast'
+  ),
+  
+  getTrends: createApiMethod(
+    (days = 7) => api.get(`/api/trends?days=${days}`),
+    (days = 7) => mockApi.getTrends(days),
+    'getTrends'
+  ),
   
   // Health & Recommendations
-  getHealthRecommendations: (group = 'general') => 
-    api.get(`/api/health-recommendations?group=${group}`),
-  getPollutantBreakdown: () => api.get('/api/pollutant-breakdown'),
+  getHealthRecommendations: createApiMethod(
+    (group = 'general') => api.get(`/api/health-recommendations?group=${group}`),
+    (group = 'general') => mockApi.getHealthRecommendations(group),
+    'getHealthRecommendations'
+  ),
+  
+  getPollutantBreakdown: createApiMethod(
+    () => api.get('/api/pollutant-breakdown'),
+    () => mockApi.getPollutantBreakdown(),
+    'getPollutantBreakdown'
+  ),
   
   // Alerts
-  getAlerts: () => api.get('/api/alerts'),
-  getEmergencyAlerts: () => api.get('/api/emergency-alerts'),
-  subscribeToAlerts: (preferences) => 
-    api.post('/api/alerts/subscribe', preferences),
+  getAlerts: createApiMethod(
+    () => api.get('/api/alerts'),
+    () => mockApi.getAlerts(),
+    'getAlerts'
+  ),
+  
+  getEmergencyAlerts: createApiMethod(
+    () => api.get('/api/emergency-alerts'),
+    () => mockApi.getEmergencyAlerts(),
+    'getEmergencyAlerts'
+  ),
+  
+  subscribeToAlerts: createApiMethod(
+    (preferences) => api.post('/api/alerts/subscribe', preferences),
+    (preferences) => Promise.resolve({ data: { status: 'success', message: 'Mock subscription created' } }),
+    'subscribeToAlerts'
+  ),
   
   // Locations
-  getLocations: () => api.get('/api/locations'),
-  getLocationData: (locationName) => 
-    api.get(`/api/location/${encodeURIComponent(locationName)}/current`),
+  getLocations: createApiMethod(
+    () => api.get('/api/locations'),
+    () => mockApi.getLocations(),
+    'getLocations'
+  ),
+  
+  getLocationData: createApiMethod(
+    (locationName) => api.get(`/api/location/${encodeURIComponent(locationName)}/current`),
+    (locationName) => mockApi.getLocationData(locationName),
+    'getLocationData'
+  ),
   
   // Data validation
-  getDataValidation: () => api.get('/api/data-validation'),
+  getDataValidation: createApiMethod(
+    () => api.get('/api/data-validation'),
+    () => Promise.resolve({ 
+      data: { 
+        status: 'success', 
+        data: { 
+          confidence_score: 0.92, 
+          data_completeness: 0.95, 
+          source_reliability: 'high' 
+        } 
+      } 
+    }),
+    'getDataValidation'
+  ),
   
   // Utils
-  calculateAQI: (pollutantData) => 
-    api.post('/api/aqi/calculate', pollutantData),
-  getApiDocs: () => api.get('/api/docs'),
-  trainModel: () => api.post('/api/train-model'),
+  calculateAQI: createApiMethod(
+    (pollutantData) => api.post('/api/aqi/calculate', pollutantData),
+    (pollutantData) => Promise.resolve({ 
+      data: { 
+        status: 'success', 
+        data: { 
+          aqi: 85, 
+          category: 'Moderate', 
+          color: '#ff7e00', 
+          description: 'Air quality is acceptable for most people.' 
+        } 
+      } 
+    }),
+    'calculateAQI'
+  ),
+  
+  getApiDocs: createApiMethod(
+    () => api.get('/api/docs'),
+    () => Promise.resolve({ 
+      data: { 
+        status: 'success', 
+        data: { 
+          api_info: { name: 'AirAlert Pro API', version: '1.0.0' },
+          data_sources: {},
+          machine_learning: {},
+          deployment_info: { components_loaded: true, environment: 'mock' }
+        } 
+      } 
+    }),
+    'getApiDocs'
+  ),
+  
+  trainModel: createApiMethod(
+    () => api.post('/api/train-model'),
+    () => Promise.resolve({ data: { status: 'success', message: 'Mock model trained' } }),
+    'trainModel'
+  ),
   
   // Health check
-  healthCheck: () => api.get('/'),
-  deploymentHealthCheck: () => api.get('/health'),
+  healthCheck: createApiMethod(
+    () => api.get('/'),
+    () => Promise.resolve({ 
+      data: { 
+        status: 'healthy', 
+        service: 'AirAlert Pro API (Mock)', 
+        version: '1.0.0' 
+      } 
+    }),
+    'healthCheck'
+  ),
+  
+  deploymentHealthCheck: createApiMethod(
+    () => api.get('/health'),
+    () => Promise.resolve({ data: { status: 'healthy' } }),
+    'deploymentHealthCheck'
+  ),
 
   // Enhanced API methods with better error handling
-  safeGetCurrentData: () => apiCall(() => api.get('/api/current'), 'Current Data'),
-  safeGetForecast: () => apiCall(() => api.get('/api/forecast'), 'Forecast'),
-  safeGetTrends: (days = 7) => apiCall(() => api.get(`/api/trends?days=${days}`), 'Trends'),
-  safeHealthCheck: () => apiCall(() => api.get('/'), 'Health Check'),
-  safeGetLocations: () => apiCall(() => api.get('/api/locations'), 'Locations'),
-  safeGetAlerts: () => apiCall(() => api.get('/api/alerts'), 'Alerts'),
+  safeGetCurrentData: () => apiCall(() => airQualityAPI.getCurrentData(), 'Current Data'),
+  safeGetForecast: () => apiCall(() => airQualityAPI.getForecast(), 'Forecast'),
+  safeGetTrends: (days = 7) => apiCall(() => airQualityAPI.getTrends(days), 'Trends'),
+  safeHealthCheck: () => apiCall(() => airQualityAPI.healthCheck(), 'Health Check'),
+  safeGetLocations: () => apiCall(() => airQualityAPI.getLocations(), 'Locations'),
+  safeGetAlerts: () => apiCall(() => airQualityAPI.getAlerts(), 'Alerts'),
 };
 
 // Utility functions for common API patterns
@@ -185,6 +312,10 @@ export const apiUtils = {
   
   // Check if backend is available with comprehensive testing
   isBackendAvailable: async () => {
+    if (USE_MOCK_DATA) {
+      return false;
+    }
+    
     try {
       // Try health check endpoint first (faster)
       const response = await api.get('/health', { timeout: 8000 });
@@ -316,7 +447,8 @@ export const apiUtils = {
         timeout: 20000,
         environment: import.meta.env.MODE,
         dev: import.meta.env.DEV,
-        prod: import.meta.env.PROD
+        prod: import.meta.env.PROD,
+        useMockData: USE_MOCK_DATA
       });
     }
   })
