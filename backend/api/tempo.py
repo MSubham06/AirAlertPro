@@ -15,7 +15,11 @@ class TempoAPI:
         self.headers = {
             'Authorization': f'Bearer {self.token}',
             'Content-Type': 'application/json'
-        }
+        } if self.token else {}
+        
+        # Warn if token is missing
+        if not self.token:
+            print("⚠️  NASA_TOKEN not found. Using mock data for TEMPO API.")
     
     def get_latest_data(self, lat=Config.GOA_COORDINATES['latitude'], 
                        lon=Config.GOA_COORDINATES['longitude']):
@@ -23,6 +27,10 @@ class TempoAPI:
         Get latest TEMPO data for specified coordinates
         Note: This is a mock implementation as TEMPO API access requires specific endpoints
         """
+        # If no token is provided, return mock data immediately
+        if not self.token:
+            return self._get_mock_data(lat, lon)
+            
         try:
             # Mock TEMPO data based on typical satellite measurements
             # In real implementation, you would use earthaccess library
@@ -71,6 +79,27 @@ class TempoAPI:
         # Typical HCHO values (µg/m³)
         base_value = random.uniform(5, 25)
         return round(base_value, 2)
+    
+    def _get_mock_data(self, lat, lon):
+        """Generate mock data when API is unavailable"""
+        import random
+        # Typical values for Indian coastal cities
+        mock_data = {
+            'timestamp': datetime.now().isoformat(),
+            'latitude': lat,
+            'longitude': lon,
+            'no2_column': round(random.uniform(20, 80), 2),
+            'o3_column': round(random.uniform(60, 120), 2),
+            'hcho_column': round(random.uniform(5, 25), 2),
+            'quality_flag': 'good',
+            'cloud_fraction': round(random.uniform(0, 0.8), 2)
+        }
+        
+        return {
+            'status': 'success',
+            'data': mock_data,
+            'source': 'TEMPO_MOCK'
+        }
     
     def get_historical_data(self, days=7):
         """Get historical TEMPO data for trend analysis"""

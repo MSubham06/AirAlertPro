@@ -14,7 +14,11 @@ class OpenAQAPI:
         self.headers = {
             'X-API-Key': self.api_key,
             'Content-Type': 'application/json'
-        }
+        } if self.api_key else {}
+        
+        # Warn if API key is missing
+        if not self.api_key:
+            print("⚠️  OPENAQ_API_KEY not found. Using mock data for OpenAQ API.")
     
     def get_latest_measurements(self, lat=Config.GOA_COORDINATES['latitude'],
                               lon=Config.GOA_COORDINATES['longitude'],
@@ -22,6 +26,10 @@ class OpenAQAPI:
         """
         Get latest air quality measurements near Goa
         """
+        # If no API key is provided, return mock data immediately
+        if not self.api_key:
+            return self._get_mock_data()
+            
         try:
             params = {
                 'coordinates': f'{lat},{lon}',
@@ -110,6 +118,10 @@ class OpenAQAPI:
     
     def get_stations_near_location(self, lat, lon, radius=50000):
         """Get monitoring stations near specified location"""
+        # If no API key is provided, return None
+        if not self.api_key:
+            return None
+            
         try:
             params = {
                 'coordinates': f'{lat},{lon}',

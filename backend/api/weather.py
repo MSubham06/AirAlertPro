@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 from datetime import datetime, timedelta
 from config import Config
+from api.meteomatics import MeteomaticsAPI
 
 class WeatherAPI:
     """
@@ -10,6 +11,7 @@ class WeatherAPI:
     
     def __init__(self):
         self.base_url = Config.WEATHER_API_URL
+        self.meteomatics = MeteomaticsAPI()
     
     def get_current_weather(self, lat=Config.GOA_COORDINATES['latitude'],
                           lon=Config.GOA_COORDINATES['longitude']):
@@ -44,7 +46,13 @@ class WeatherAPI:
                     'source': 'Open-Meteo'
                 }
             else:
-                return self._get_mock_weather()
+                # Try Meteomatics as fallback
+                print("Open-Meteo failed, trying Meteomatics API...")
+                meteo_result = self.meteomatics.get_current_weather(lat, lon)
+                if meteo_result['status'] == 'success':
+                    return meteo_result
+                else:
+                    return self._get_mock_weather()
                 
         except Exception as e:
             print(f"Error fetching weather data: {e}")
@@ -88,7 +96,13 @@ class WeatherAPI:
                     'source': 'Open-Meteo'
                 }
             else:
-                return self._get_mock_forecast(days)
+                # Try Meteomatics as fallback
+                print("Open-Meteo forecast failed, trying Meteomatics API...")
+                meteo_result = self.meteomatics.get_forecast_weather(days)
+                if meteo_result['status'] == 'success':
+                    return meteo_result
+                else:
+                    return self._get_mock_forecast(days)
                 
         except Exception as e:
             print(f"Error fetching weather forecast: {e}")
